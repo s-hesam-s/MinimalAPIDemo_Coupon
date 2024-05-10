@@ -4,6 +4,7 @@ using MagicVilla_CouponAPI.Models;
 using MagicVilla_CouponAPI.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 
@@ -31,17 +33,19 @@ app.MapGet("/api/coupon", (ILogger<Program> _logger) =>
 }).WithName("GetCoupons").Produces<IEnumerable<Coupon>>(200);
 
 
-app.MapGet("/api/coupon/{id:int}", (int id) =>
+app.MapGet("/api/coupon/{id:int}", (ILogger<Program> _logger, int id) =>
 {
     return Results.Ok(CouponStore.couponList.FirstOrDefault(u => u.Id == id));
 }).WithName("GetCoupon").Produces<Coupon>(200);
 
 
-app.MapPost("/api/coupon", (IMapper _mapper, [FromBody] CouponCreateDTO coupon_C_DTO) =>
+app.MapPost("/api/coupon", async (IMapper _mapper,
+    IValidator<CouponCreateDTO> _validation, [FromBody] CouponCreateDTO coupon_C_DTO) =>
 {
-    if (string.IsNullOrEmpty(coupon_C_DTO.Name))
+    var validationResult = await _validation.ValidateAsync(coupon_C_DTO);
+    if (!validationResult.IsValid)
     {
-        return Results.BadRequest("Invalid Id or Coupon Name");
+        return Results.BadRequest(validationResult.Errors.FirstOrDefault().ToString());
     }
     if (CouponStore.couponList.FirstOrDefault(u => u.Name.ToLower() == coupon_C_DTO.Name.ToLower()) != null)
     {
