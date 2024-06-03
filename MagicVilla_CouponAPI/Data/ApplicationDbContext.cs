@@ -1,9 +1,10 @@
 ﻿using MagicVilla_CouponAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicVilla_CouponAPI.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -12,10 +13,13 @@ namespace MagicVilla_CouponAPI.Data
 
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<LocalUser> LocalUsers { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Coupon>().HasData(
                 new Coupon()
                 {
