@@ -93,15 +93,23 @@ namespace MagicVilla_CouponAPI.Repository
                 var result = await _userManager.CreateAsync(userObj, requestDTO.Password);
                 if (result.Succeeded)
                 {
-                    if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
+                    const string customerRole = "customer";
+                    if (!await _roleManager.RoleExistsAsync(customerRole))
                     {
-                        await _roleManager.CreateAsync(new IdentityRole("admin"));
-                        await _roleManager.CreateAsync(new IdentityRole("customer"));
+                        var roleResult = await _roleManager.CreateAsync(new IdentityRole(customerRole));
+                        if (!roleResult.Succeeded)
+                        {
+                            await _userManager.DeleteAsync(userObj);
+                            return null;
+                        }
                     }
-                    await _userManager.AddToRoleAsync(userObj, "admin");
-
-                    var user = _db.ApplicationUsers.FirstOrDefault(u => u.UserName == requestDTO.UserName);
-                    return _mapper.Map<UserDTO>(user);
+                    var assignmentResult = await _userManager.AddToRoleAsync(userObj, customerRole);
+                    if (!assignmentResult.Succeeded)
+                    {
+                        await _userManager.DeleteAsync(userObj);
+                        return null;
+                    }
+                    return _mapper.Map<UserDTO>(userObj);
                 }
             }
             catch (Exception e)
