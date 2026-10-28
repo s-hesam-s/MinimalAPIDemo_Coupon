@@ -1,3 +1,4 @@
+using MagicVilla_CouponAPI.Security;
 using MagicVilla_CouponAPI;
 using MagicVilla_CouponAPI.Data;
 using FluentValidation;
@@ -51,27 +52,7 @@ builder.Services.AddSingleton<MappingConfig>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
-{
-    x.RequireHttpsMetadata = false;
-    x.SaveToken = true;
-    x.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
-            builder.Configuration.GetValue<string>("ApiSettings:Secret"))),
-        ValidateIssuer = false,
-        ValidateAudience = false
-    };
-});
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("admin"));
-});
+builder.Services.AddCouponAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
@@ -82,8 +63,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.ConfigureCouponEndpoints();
 app.ConfigureAuthEndpoints();
@@ -92,12 +73,14 @@ app.UseHttpsRedirection();
 
 app.MapGet("/api/coupon/special", ([AsParameters] CouponRequest req, ApplicationDbContext _db) =>
 {
+    if (req.Page < 1 || req.PageSize < 1 || req.PageSize > 100 || req.Page > 1_000_000)
+        return Results.BadRequest("Invalid paging parameters.");
     if (req.CouponName != null)
     {
-        return _db.Coupons.Where(u => u.Name.Contains(req.CouponName)).Skip((req.Page - 1) * req.PageSize).Take(req.PageSize);
+        return Results.Ok(_db.Coupons.AsNoTracking().Where(u => u.Name.Contains(req.CouponName)).Skip((req.Page - 1) * req.PageSize).Take(req.PageSize).ToList());
     }
-    return _db.Coupons.Skip((req.Page - 1) * req.PageSize).Take(req.PageSize);
-});
+    return Results.Ok(_db.Coupons.AsNoTracking().Skip((req.Page - 1) * req.PageSize).Take(req.PageSize).ToList());
+}).RequireAuthorization("AdminOnly");
 
 app.Run();
 

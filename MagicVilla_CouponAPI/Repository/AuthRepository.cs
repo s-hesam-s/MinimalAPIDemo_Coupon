@@ -1,3 +1,4 @@
+using MagicVilla_CouponAPI.Security;
 using MagicVilla_CouponAPI;
 using MagicVilla_CouponAPI.Data;
 using MagicVilla_CouponAPI.Models.DTO;
@@ -58,11 +59,14 @@ namespace MagicVilla_CouponAPI.Repository
             var roles = await _userManager.GetRolesAsync(user);
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(secretKey);
+            var key = Encoding.UTF8.GetBytes(secretKey);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                Issuer = JwtConfiguration.Issuer(_configuration),
+                Audience = JwtConfiguration.Audience(_configuration),
                 Subject = new ClaimsIdentity(new Claim[]
                 {
+                    new Claim(ClaimTypes.NameIdentifier,user.Id),
                     new Claim(ClaimTypes.Name,user.UserName),
                     new Claim(ClaimTypes.Role,roles.FirstOrDefault()),
                 }),
