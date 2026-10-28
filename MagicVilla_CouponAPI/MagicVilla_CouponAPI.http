@@ -1,6 +1,16 @@
 @MagicVilla_CouponAPI_HostAddress = http://localhost:5242
+@AdminToken =
 
-GET {{MagicVilla_CouponAPI_HostAddress}}/weatherforecast/
+### Anonymous request: expected 401. No registration or write is performed.
+GET {{MagicVilla_CouponAPI_HostAddress}}/api/coupon
 Accept: application/json
 
-###
+### Set AdminToken locally from an authorized development session. Do not commit tokens.
+GET {{MagicVilla_CouponAPI_HostAddress}}/api/coupon
+Authorization: Bearer {{AdminToken}}
+Accept: application/json
+
+### Invalid ID: expected 400 with an authorized admin token.
+GET {{MagicVilla_CouponAPI_HostAddress}}/api/coupon/0
+Authorization: Bearer {{AdminToken}}
+Accept: application/json

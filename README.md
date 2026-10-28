@@ -2,6 +2,14 @@
 
 An educational ASP.NET Core Minimal API for coupon management, demonstrating endpoint registration, validation and token-based authorization.
 
+## Captured preview
+
+![Minimal API Coupon — observed local output](docs/screenshots/portfolio-poster.png)
+
+Real coupon endpoints and JWT policies in an in-process HTTP fixture: anonymous 401, customer 403, admin 200 and invalid ID 400.
+
+[Reproduce this capture and view the static image](docs/PORTFOLIO-PREVIEW.md)
+
 ## Implementation highlights
 
 - Coupon read/create/update/delete endpoints and a separate filtering/pagination exercise.
