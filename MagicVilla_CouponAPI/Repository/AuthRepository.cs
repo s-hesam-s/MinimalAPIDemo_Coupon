@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using MagicVilla_CouponAPI;
 using MagicVilla_CouponAPI.Data;
 using MagicVilla_CouponAPI.Models.DTO;
 using MagicVilla_CouponAPI.Models;
@@ -14,13 +14,13 @@ namespace MagicVilla_CouponAPI.Repository
     public class AuthRepository : IAuthRepository
     {
         private readonly ApplicationDbContext _db;
-        private readonly IMapper _mapper;
+        private readonly MappingConfig _mapper;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private string secretKey;
         public AuthRepository(ApplicationDbContext db,
-            IMapper mapper,
+            MappingConfig mapper,
             IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager)
@@ -73,7 +73,7 @@ namespace MagicVilla_CouponAPI.Repository
             var token = tokenHandler.CreateToken(tokenDescriptor);
             LoginResponseDTO loginResponseDTO = new()
             {
-                User = _mapper.Map<UserDTO>(user),
+                User = _mapper.ToUserDTO(user),
                 Token = new JwtSecurityTokenHandler().WriteToken(token)
             };
             return loginResponseDTO;
@@ -109,7 +109,7 @@ namespace MagicVilla_CouponAPI.Repository
                         await _userManager.DeleteAsync(userObj);
                         return null;
                     }
-                    return _mapper.Map<UserDTO>(userObj);
+                    return _mapper.ToUserDTO(userObj);
                 }
             }
             catch (Exception e)

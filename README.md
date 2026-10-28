@@ -5,7 +5,7 @@ An educational ASP.NET Core Minimal API for coupon management, demonstrating end
 ## Implementation highlights
 
 - Coupon read/create/update/delete endpoints and a separate filtering/pagination exercise.
-- FluentValidation, AutoMapper and repository-based EF Core access.
+- FluentValidation, explicit DTO mapping and repository-based EF Core access.
 - Identity registration/login, JWT generation and an AdminOnly policy.
 - Endpoint filters and typed API response models.
 
@@ -21,7 +21,7 @@ Public registration assigns the customer role. Administrative access must be pro
 
 ## Requirements and configuration
 
-Use an SDK capable of targeting .NET 8 and an isolated SQL Server development database. Package restore requires access to the configured NuGet feeds. These are existing .NET 8 examples; dependency and runtime modernization are separate work.
+Use an SDK capable of targeting .NET 10 and an isolated SQL Server development database. Package restore requires access to the configured NuGet feeds. The projects target .NET 10 LTS. Install the latest supported .NET 10 SDK and runtime patch.
 
 Read [SECURITY-SETUP.md](SECURITY-SETUP.md) before configuring credentials. Tracked secret values are intentionally empty. Use environment variables for your own development resources; do not restore old values from Git history.
 
@@ -62,6 +62,12 @@ This is an educational repository. The implementation notes describe the code in
 
 ## Continuous integration
 
-GitHub Actions restores and builds `MinimalAPIDemo.sln` in Release mode on Windows using the existing .NET 8 target. It also runs `scripts/Test-PublicConfiguration.ps1` without printing configured values. The existing authorization regressions run with mocked dependencies and in-memory HTTP hosts where applicable. The application hosts, database migrations/seeds, cloud integrations and payments are not started by CI.
+GitHub Actions restores and builds `MinimalAPIDemo.sln` in Release mode on Windows using the .NET 10 target. It also runs `scripts/Test-PublicConfiguration.ps1` without printing configured values. The existing authorization regressions run with mocked dependencies and in-memory HTTP hosts where applicable. The application hosts, database migrations/seeds, cloud integrations and payments are not started by CI.
 
 The [CI workflow](.github/workflows/ci.yml) runs for pull requests and pushes to `master`, and can be started manually. It uses read-only repository permissions and does not deploy the project.
+
+## Runtime maintenance
+
+See [runtime, dependency audit and migration notes](docs/RUNTIME.md) for the .NET 10 target and verification boundaries.
+
+[Local verification snapshot](docs/VERIFICATION.md) records the build, isolated-test and dependency-audit boundaries.
