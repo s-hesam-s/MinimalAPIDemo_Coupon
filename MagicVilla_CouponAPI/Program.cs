@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MagicVilla_CouponAPI.Repository;
 using MagicVilla_CouponAPI.Repository.IRepository;
 using MagicVilla_CouponAPI.Endpoints;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -36,22 +36,9 @@ builder.Services.AddSwaggerGen(option =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-    option.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    option.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header,
-            },
-            new List<string>()
-        }
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>()
     });
 });
 builder.Services.AddScoped<ICouponRepository, CouponRepository>();
@@ -60,7 +47,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddAutoMapper(typeof(MappingConfig));
+builder.Services.AddSingleton<MappingConfig>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 

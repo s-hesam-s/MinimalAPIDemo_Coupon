@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using MagicVilla_CouponAPI;
 using FluentValidation;
 using MagicVilla_CouponAPI.Models.DTO;
 using MagicVilla_CouponAPI.Models;
@@ -72,7 +72,7 @@ namespace MagicVilla_CouponAPI.Endpoints
         }
 
         [Authorize]
-        private async static Task<IResult> CreateCoupon(ICouponRepository _couponRepo, IMapper _mapper,
+        private async static Task<IResult> CreateCoupon(ICouponRepository _couponRepo, MappingConfig _mapper,
                 IValidator<CouponCreateDTO> _validation, [FromBody] CouponCreateDTO coupon_C_DTO)
         {
             APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
@@ -90,12 +90,12 @@ namespace MagicVilla_CouponAPI.Endpoints
                 return Results.BadRequest(response);
             }
 
-            Coupon coupon = _mapper.Map<Coupon>(coupon_C_DTO);
+            Coupon coupon = _mapper.ToCoupon(coupon_C_DTO);
 
             await _couponRepo.CreateAsync(coupon);
             await _couponRepo.SaveAsync();
 
-            CouponDTO couponDTO = _mapper.Map<CouponDTO>(coupon);
+            CouponDTO couponDTO = _mapper.ToCouponDTO(coupon);
 
             response.Result = couponDTO;
             response.IsSuccess = true;
@@ -106,7 +106,7 @@ namespace MagicVilla_CouponAPI.Endpoints
         }
 
         [Authorize]
-        private async static Task<IResult> UpdateCoupon(ICouponRepository _couponRepo, IMapper _mapper,
+        private async static Task<IResult> UpdateCoupon(ICouponRepository _couponRepo, MappingConfig _mapper,
                 IValidator<CouponUpdateDTO> _validation, [FromBody] CouponUpdateDTO coupon_U_DTO)
         {
             APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
@@ -126,10 +126,10 @@ namespace MagicVilla_CouponAPI.Endpoints
             //couponFromStore.LastUpdated = DateTime.Now;
             //await _db.SaveChangesAsync();
 
-            await _couponRepo.UpdateAsync(_mapper.Map<Coupon>(coupon_U_DTO));
+            await _couponRepo.UpdateAsync(_mapper.ToCoupon(coupon_U_DTO));
             await _couponRepo.SaveAsync();
 
-            response.Result = _mapper.Map<CouponDTO>(await _couponRepo.GetAsync(coupon_U_DTO.Id)); ;
+            response.Result = _mapper.ToCouponDTO(await _couponRepo.GetAsync(coupon_U_DTO.Id)); ;
             response.IsSuccess = true;
             response.StatusCode = HttpStatusCode.OK;
             return Results.Ok(response);
