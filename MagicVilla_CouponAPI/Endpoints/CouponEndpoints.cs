@@ -43,11 +43,11 @@ namespace MagicVilla_CouponAPI.Endpoints
                 })
                .RequireAuthorization("AdminOnly");
 
-            app.MapPost("/api/coupon", CreateCoupon).WithName("CreateCoupon").Accepts<CouponCreateDTO>("application/json").Produces<APIResponse>(201).Produces(400);
+            app.MapPost("/api/coupon", CreateCoupon).WithName("CreateCoupon").Accepts<CouponCreateDTO>("application/json").Produces<APIResponse>(201).Produces(400).RequireAuthorization("AdminOnly");
 
-            app.MapPut("/api/coupon", UpdateCoupon).WithName("UpdateCoupon").Accepts<CouponUpdateDTO>("application/json").Produces<APIResponse>(200).Produces(400);
+            app.MapPut("/api/coupon", UpdateCoupon).WithName("UpdateCoupon").Accepts<CouponUpdateDTO>("application/json").Produces<APIResponse>(200).Produces(400).RequireAuthorization("AdminOnly");
 
-            app.MapDelete("/api/coupon/{id:int}", DeleteCoupon).WithName("DeleteCoupon").Accepts<int>("application/json").Produces<APIResponse>(204).Produces(400); ;
+            app.MapDelete("/api/coupon/{id:int}", DeleteCoupon).WithName("DeleteCoupon").Accepts<int>("application/json").Produces<APIResponse>(204).Produces(400).RequireAuthorization("AdminOnly"); ;
         }
 
 
@@ -71,7 +71,7 @@ namespace MagicVilla_CouponAPI.Endpoints
             return Results.Ok(response);
         }
 
-        [Authorize]
+        [Authorize(Policy = "AdminOnly")]
         private async static Task<IResult> CreateCoupon(ICouponRepository _couponRepo, MappingConfig _mapper,
                 IValidator<CouponCreateDTO> _validation, [FromBody] CouponCreateDTO coupon_C_DTO)
         {
@@ -105,7 +105,7 @@ namespace MagicVilla_CouponAPI.Endpoints
             //return Results.Created($"/api/coupon/{coupon.Id}",coupon);
         }
 
-        [Authorize]
+        [Authorize(Policy = "AdminOnly")]
         private async static Task<IResult> UpdateCoupon(ICouponRepository _couponRepo, MappingConfig _mapper,
                 IValidator<CouponUpdateDTO> _validation, [FromBody] CouponUpdateDTO coupon_U_DTO)
         {
@@ -135,7 +135,7 @@ namespace MagicVilla_CouponAPI.Endpoints
             return Results.Ok(response);
         }
 
-        [Authorize]
+        [Authorize(Policy = "AdminOnly")]
         private async static Task<IResult> DeleteCoupon(ICouponRepository _couponRepo, int id)
         {
             APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };

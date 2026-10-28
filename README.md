@@ -17,7 +17,7 @@ Public registration assigns the customer role. Administrative access must be pro
 - [Repository](MagicVilla_CouponAPI/Repository): data access and account operations.
 - [Data](MagicVilla_CouponAPI/Data): EF Core context.
 - [Models](MagicVilla_CouponAPI/Models): entities and request/response DTOs.
-- [tests/Authorization.Tests](tests/Authorization.Tests): customer-role registration regressions.
+- [tests/Authorization.Tests](tests/Authorization.Tests): customer-role registration and signed-JWT HTTP authorization regressions.
 
 ## Requirements and configuration
 

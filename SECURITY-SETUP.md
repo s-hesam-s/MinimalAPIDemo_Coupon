@@ -27,3 +27,11 @@ Historical commits may still contain previous training values. If a value was ev
 Run `dotnet test tests/Authorization.Tests/Authorization.Tests.csproj`. The tests replace Identity managers with mocks and never start the application or connect to a database, payment provider or messaging service.
 
 Run `pwsh -File scripts/Test-PublicConfiguration.ps1` to check public configuration without displaying values.
+
+## Coupon authorization and JWT contract
+
+Coupon reads, creates, updates and deletes, including the special paginated query, require the `AdminOnly` policy and the `admin` role. Public registration cannot grant that role. Provision it only through a trusted local administration process.
+
+The issuer and validator use the same UTF-8 signing key and configuration. Set `ApiSettings__Secret` to a locally generated random secret of at least 32 bytes. Optional `ApiSettings__Issuer` and `ApiSettings__Audience` default to `magicvilla-coupon` and `magicvilla-coupon-client`. Validation requires HS256, signing key, issuer, audience and expiration, with 30 seconds of clock skew. Existing tokens with the previous missing issuer/audience must be reissued.
+
+Tests use signed fixture tokens and in-process HTTP, including anonymous/customer denial and invalid signature, issuer, audience and expiration. No original host, database or identity store is started.
