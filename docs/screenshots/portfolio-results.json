@@ -1,0 +1,30 @@
+[
+  {
+    "scenario": "Anonymous",
+    "method": "GET",
+    "path": "/api/coupon",
+    "status": 401,
+    "body": ""
+  },
+  {
+    "scenario": "Customer",
+    "method": "GET",
+    "path": "/api/coupon",
+    "status": 403,
+    "body": ""
+  },
+  {
+    "scenario": "Admin",
+    "method": "GET",
+    "path": "/api/coupon",
+    "status": 200,
+    "body": "{\"isSuccess\":true,\"result\":[{\"id\":1,\"name\":\"SAMPLE10\",\"percent\":10,\"isActive\":true,\"created\":null,\"lastUpdated\":null}],\"statusCode\":200,\"errorMessages\":[]}"
+  },
+  {
+    "scenario": "Endpoint validation",
+    "method": "GET",
+    "path": "/api/coupon/0",
+    "status": 400,
+    "body": "\"Cannot have 0 in id\""
+  }
+]
